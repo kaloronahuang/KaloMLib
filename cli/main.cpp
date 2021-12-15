@@ -84,6 +84,42 @@ matrix processArithmetic(string typ)
             return matrix::identity(1);
         }
     }
+    else if (typ == "elm")
+    {
+        string operand;
+        cin >> operand;
+        if (!pool.count(operand))
+            throw invalid_argument("Invalid operand name.");
+        try
+        {
+            matrix ret = matrix::eliminate(pool[operand]);
+            return ret;
+        }
+        catch (const std::exception &e)
+        {
+            cout << e.what() << '\n';
+            return matrix::identity(1);
+        }
+    }
+    else if (typ == "rnk")
+    {
+        string operand;
+        cin >> operand;
+        if (!pool.count(operand))
+            throw invalid_argument("Invalid operand name.");
+        try
+        {
+            long ret = matrix::rank(pool[operand]);
+            matrix rret(make_pair(1, 1));
+            rret[0][0] = ret;
+            return rret;
+        }
+        catch (const std::exception &e)
+        {
+            cout << e.what() << '\n';
+            return matrix::identity(1);
+        }
+    }
     else
         throw invalid_argument("Invalid operator.");
 }

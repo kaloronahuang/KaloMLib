@@ -13,6 +13,7 @@ namespace KaloMLib
         void resize(std::pair<long, long> shape);
         matrix();
         matrix(std::pair<long, long> shape);
+        matrix(const matrix &target);
         matrix operator+(const matrix &rhs);
         matrix operator*(const matrix &rhs);
         matrix transpose();
@@ -22,6 +23,7 @@ namespace KaloMLib
         static matrix reducedEchelonForm(const matrix &rhs);
         static long rank(const matrix &rhs);
         static matrix inverse(const matrix &rhs);
+        static matrix eliminate(const matrix &rhs);
 
         long ln, col;
 

@@ -24,6 +24,12 @@ matrix::matrix() { this->block = nullptr, resize(std::make_pair(1, 1)); }
 
 matrix::matrix(std::pair<long, long> shape) { this->block = nullptr, resize(shape); }
 
+matrix::matrix(const matrix &target)
+{
+    this->block = nullptr, resize(std::make_pair(target.ln, target.col));
+    memcpy(this->block, target.block, sizeof(double) * target.ln * target.col);
+}
+
 double *matrix::operator[](const long &rhs) { return block + 1LL * rhs * col; }
 
 matrix matrix::operator+(const matrix &rhs)
@@ -102,7 +108,7 @@ matrix matrix::reducedEchelonForm(const matrix &rhs)
         for (long j = i - 1; j >= 0; j--)
         {
             double rate = ret[j][i] / pivot;
-            for (int k = i; k < ret.col; k++)
+            for (long k = i; k < ret.col; k++)
                 ret[j][k] -= rate * ret[i][k];
         }
     }
@@ -111,7 +117,12 @@ matrix matrix::reducedEchelonForm(const matrix &rhs)
 
 long matrix::rank(const matrix &rhs)
 {
-    return -1;
+    matrix ret = eliminate(rhs);
+    long res = 0, limit = std::min(rhs.ln, rhs.col);
+    for (; res < limit; res++)
+        if (fabs(ret[res][res]) < KALOMLIB_eps)
+            break;
+    return res;
 }
 
 matrix matrix::inverse(const matrix &rhs)
@@ -119,19 +130,68 @@ matrix matrix::inverse(const matrix &rhs)
     if (rhs.ln == rhs.col)
     {
         matrix mma(std::make_pair(rhs.ln, rhs.col << 1)), _rhs = rhs;
-        for (int i = 0; i < _rhs.ln; i++)
+        for (long i = 0; i < _rhs.ln; i++)
         {
             mma[i][i + _rhs.col] = 1;
-            for (int j = 0; j < _rhs.col; j++)
+            for (long j = 0; j < _rhs.col; j++)
                 mma[i][j] = _rhs[i][j];
         }
         mma = reducedEchelonForm(mma);
         matrix ret(std::make_pair(rhs.ln, rhs.col));
-        for (int i = 0; i < _rhs.ln; i++)
-            for (int j = 0; j < _rhs.col; j++)
+        for (long i = 0; i < _rhs.ln; i++)
+            for (long j = 0; j < _rhs.col; j++)
                 ret[i][j] = mma[i][j + _rhs.col];
         return ret;
     }
     else
         throw std::invalid_argument("The matrix you wanna inverse is not a square matrix.");
+}
+
+matrix matrix::eliminate(const matrix &rhs)
+{
+    matrix ret = rhs;
+    long pivot_pos = 0;
+    for (long i = 0; i < ret.ln; i++, pivot_pos++)
+    {
+        double pivot = ret[i][pivot_pos];
+        while (fabs(pivot) < KALOMLIB_eps && pivot_pos < ret.col)
+        {
+            for (long j = i + 1; j < ret.ln; j++)
+                if (fabs(ret[j][pivot_pos]) >= KALOMLIB_eps)
+                {
+                    for (long k = pivot_pos; k < ret.col; k++)
+                        std::swap(ret[i][k], ret[j][k]);
+                    break;
+                }
+            pivot = ret[i][pivot_pos];
+            if (fabs(pivot) < KALOMLIB_eps)
+                pivot_pos++;
+        }
+        if (pivot_pos >= ret.col)
+            break;
+        for (long j = i + 1; j < ret.ln; j++)
+        {
+            double rate = ret[j][i] / pivot;
+            for (long k = i; k < ret.col; k++)
+                ret[j][k] -= rate * ret[i][k];
+        }
+    }
+    for (long i = ret.ln - 1; i >= 0; i--)
+    {
+        long pivot_pos = i;
+        while (fabs(ret[i][pivot_pos]) < KALOMLIB_eps && pivot_pos < ret.col)
+            pivot_pos++;
+        if (pivot_pos >= ret.col)
+            continue;
+        double pivot = ret[i][pivot_pos];
+        for (long j = i - 1; j >= 0; j--)
+        {
+            double rate = ret[j][i] / pivot;
+            for (long k = i; k < ret.col; k++)
+                ret[j][k] -= rate * ret[i][k];
+        }
+        for (long j = pivot_pos; j < ret.col; j++)
+            ret[i][j] /= pivot;
+    }
+    return ret;
 }
