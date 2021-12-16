@@ -120,6 +120,40 @@ matrix processArithmetic(string typ)
             return matrix::identity(1);
         }
     }
+    else if (typ == "tps")
+    {
+        string operand;
+        cin >> operand;
+        if (!pool.count(operand))
+            throw invalid_argument("Invalid operand name.");
+        try
+        {
+            matrix ret = pool[operand].transpose();
+            return ret;
+        }
+        catch (const std::exception &e)
+        {
+            cout << e.what() << '\n';
+            return matrix::identity(1);
+        }
+    }
+    else if (typ == "prj")
+    {
+        string operand;
+        cin >> operand;
+        if (!pool.count(operand))
+            throw invalid_argument("Invalid operand name.");
+        try
+        {
+            matrix ret = matrix::project(pool[operand]);
+            return ret;
+        }
+        catch (const std::exception &e)
+        {
+            cout << e.what() << '\n';
+            return matrix::identity(1);
+        }
+    }
     else
         throw invalid_argument("Invalid operator.");
 }

@@ -140,7 +140,7 @@ matrix matrix::inverse(const matrix &rhs)
         matrix ret(std::make_pair(rhs.ln, rhs.col));
         for (long i = 0; i < _rhs.ln; i++)
             for (long j = 0; j < _rhs.col; j++)
-                ret[i][j] = mma[i][j + _rhs.col];
+                ret[i][j] = mma[i][j + _rhs.col] / mma[i][i];
         return ret;
     }
     else
@@ -194,4 +194,17 @@ matrix matrix::eliminate(const matrix &rhs)
             ret[i][j] /= pivot;
     }
     return ret;
+}
+
+matrix matrix::project(const matrix &rhs)
+{
+    matrix param = rhs;
+    long rnk = rank(rhs);
+    if (rnk == param.col)
+    {
+        matrix param_t = param.transpose();
+        return (param * matrix::inverse(param_t * param)) * param_t;
+    }
+    else
+        throw std::invalid_argument("The matrix doesn't describe a subspace.");
 }

@@ -24,6 +24,7 @@ namespace KaloMLib
         static long rank(const matrix &rhs);
         static matrix inverse(const matrix &rhs);
         static matrix eliminate(const matrix &rhs);
+        static matrix project(const matrix &rhs);
 
         long ln, col;
 
