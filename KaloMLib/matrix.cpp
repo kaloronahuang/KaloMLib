@@ -4,8 +4,7 @@
 #include <cstring>
 #include <cmath>
 
-#include "include/matrix.hpp"
-#include "include/constants.hpp"
+#include "include/KaloMLib.hpp"
 
 using namespace KaloMLib;
 
@@ -44,6 +43,29 @@ matrix matrix::operator+(const matrix &rhs)
     }
     else
         throw std::invalid_argument("The shapes between two matrices are not identical.");
+}
+
+matrix matrix::operator-(const matrix &rhs)
+{
+    if (rhs.ln == this->ln && rhs.col == this->col)
+    {
+        matrix ret(this->getShape()), _rhs = rhs;
+        for (long i = 0; i < ln; i++)
+            for (long j = 0; j < col; j++)
+                ret[i][j] = (*this)[i][j] - _rhs[i][j];
+        return ret;
+    }
+    else
+        throw std::invalid_argument("The shapes between two matrices are not identical.");
+}
+
+matrix matrix::operator*(const double &rhs)
+{
+    matrix ret(this->getShape());
+    for (long i = 0; i < ln; i++)
+        for (long j = 0; j < col; j++)
+            ret[i][j] = (*this)[i][j] * rhs;
+    return ret;
 }
 
 matrix matrix::operator*(const matrix &rhs)

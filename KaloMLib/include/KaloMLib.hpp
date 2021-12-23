@@ -1,2 +1,4 @@
 // KaloMLib.hpp
-#include "matrix.hpp"
+#pragma once
+#include "algorithm.hpp"
+#include "constants.hpp"

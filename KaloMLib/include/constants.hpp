@@ -1,4 +1,5 @@
 // constants.hpp
+#pragma once
 
 namespace KaloMLib
 {

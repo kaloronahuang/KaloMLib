@@ -1,4 +1,5 @@
 // matrix.hpp
+#pragma once
 #include <algorithm>
 #include <vector>
 
@@ -15,6 +16,8 @@ namespace KaloMLib
         matrix(std::pair<long, long> shape);
         matrix(const matrix &target);
         matrix operator+(const matrix &rhs);
+        matrix operator-(const matrix &rhs);
+        matrix operator*(const double &rhs);
         matrix operator*(const matrix &rhs);
         matrix transpose();
 

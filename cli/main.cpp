@@ -1,10 +1,5 @@
 // main.cpp
-#include <cstdio>
-#include <algorithm>
-#include <string>
-#include <map>
-#include <cstring>
-#include <iostream>
+#include <bits/stdc++.h>
 
 #include "cli.hpp"
 
@@ -179,7 +174,8 @@ int main()
             cin >> name;
             if (!pool.count(name))
                 cout << "Undefined reference to matrix \"" << name << "\"" << endl;
-            printMatrix(pool[name]);
+            else
+                printMatrix(pool[name]);
         }
         else if (typ == "cal")
         {
@@ -193,6 +189,66 @@ int main()
             {
                 std::cerr << e.what() << '\n';
             }
+        }
+        else if (typ == "lreg")
+        {
+            string modelName;
+            cin >> modelName;
+            cout << "Please input the filename of the training dataset: " << endl;
+            string filename;
+            cin >> filename;
+
+            ifstream file;
+            file.open(filename.c_str(), ios::in);
+            string lnstr;
+            vector<vector<string>> block;
+            while (getline(file, lnstr))
+            {
+                stringstream ss(lnstr);
+                string str;
+                vector<string> ln;
+                while (getline(ss, str, ','))
+                    ln.push_back(str);
+                block.push_back(ln);
+            }
+            file.close();
+            cout << "Item count: " << block.size() - 1 << endl;
+            vector<algorithm::linearRegression::dataset> training_set;
+            long dimension = block[0].size() - 2;
+            block.erase(block.begin());
+            for (vector<string> &ln : block)
+            {
+                matrix piece(make_pair(dimension, 1));
+                algorithm::linearRegression::dataset curt;
+                for (long i = 0; i < dimension; i++)
+                {
+                    stringstream ss(ln[i]);
+                    ss >> piece[i][0];
+                }
+                stringstream ss_y(ln[dimension]);
+                curt.first = piece;
+                ss_y >> curt.second;
+                training_set.push_back(curt);
+            }
+
+            cout << "Please input the desired limit of iterations: " << endl;
+            long limit;
+            double alpha;
+            cin >> limit;
+            cout << "Please input the desired alpha: " << endl;
+            cin >> alpha;
+            pool[modelName] = algorithm::linearRegression::linearRegression(training_set, alpha, limit);
+        }
+        else if (typ == "regeval")
+        {
+            string modelName, featurename;
+            cin >> modelName >> featurename;
+            if (!pool.count(modelName))
+                cout << "Undefined reference to matrix \"" << modelName << "\"" << endl;
+            else if (!pool.count(featurename))
+                cout << "Undefined reference to matrix \"" << featurename << "\"" << endl;
+            else
+                cout << algorithm::linearRegression::linearRegressionModelEvaluate(pool[modelName], pool[featurename]) << endl;
         }
         else
         {
